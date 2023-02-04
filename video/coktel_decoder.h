@@ -237,6 +237,7 @@ protected:
 
 	bool    _ownSurface;
 	Graphics::Surface _surface;
+	Graphics::Surface _tmpSurfBppConversion;
 
 	Common::List<Common::Rect> _dirtyRects;
 
@@ -563,6 +564,7 @@ private:
 	bool renderFrame(Common::Rect &rect);
 	bool getRenderRects(const Common::Rect &rect,
 			Common::Rect &realRect, Common::Rect &fakeRect);
+	void blitPalettedToHighColor(const Graphics::Surface &srcSurf, Common::Rect &rect);
 	void blit16(const Graphics::Surface &srcSurf, Common::Rect &rect);
 	void blit24(const Graphics::Surface &srcSurf, Common::Rect &rect);
 
