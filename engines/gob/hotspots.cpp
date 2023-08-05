@@ -329,12 +329,12 @@ void Hotspots::recalculate(bool force) {
 		}
 
 		if (_vm->_draw->_needAdjust != 2 && _vm->_draw->_needAdjust != 10) {
-			_vm->_draw->adjustCoords(0, &left, &top);
+			_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &left, &top);
 			if ((spot.flags & 15) < 3)
-				_vm->_draw->adjustCoords(2, &width, &height);
+				_vm->_draw->adjustCoords(Draw::AdjustOp::kDoublePlusOne, &width, &height);
 			else {
 				height &= 0xFFFFFFFE;
-				_vm->_draw->adjustCoords(2, nullptr, &height);
+				_vm->_draw->adjustCoords(Draw::AdjustOp::kDoublePlusOne, nullptr, &height);
 			}
 		}
 
@@ -1323,14 +1323,14 @@ void Hotspots::evaluateNew(uint16 i, uint16 *ids, InputDesc *inputs,
 	}
 
 	if (left != 0xFFFF) {
-		_vm->_draw->adjustCoords(0, &left, &top);
+		_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &left, &top);
 		if ((type & 0x3F) >= 20 || (type & 0x3F) < 3)
-			_vm->_draw->adjustCoords(0, &width, &height);
+			_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &width, &height);
 		else {
 			if (_vm->_draw->_needAdjust != 2 && _vm->_draw->_needAdjust != 10)
 				height &= 0xFFFE;
 
-			_vm->_draw->adjustCoords(0, &height, 0);
+			_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &height, 0);
 		}
 	}
 

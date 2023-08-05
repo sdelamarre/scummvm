@@ -673,8 +673,8 @@ void Game::capturePush(int16 left, int16 top, int16 width, int16 height) {
 	if (_captureCount == 20)
 		error("Game::capturePush(): Capture stack overflow");
 
-	_vm->_draw->adjustCoords(0, &left, &top);
-	_vm->_draw->adjustCoords(0, &width, &height);
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &width, &height);
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &left, &top);
 
 	_captureStack[_captureCount].left = left;
 	_captureStack[_captureCount].top = top;

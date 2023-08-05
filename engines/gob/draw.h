@@ -53,6 +53,12 @@ public:
 	static const int kCursorSurface  =  23;
 	static const int kCaptureSurface =  30;
 
+	enum AdjustOp {
+		kDouble = 0,
+		kHalf = 1,
+		kDoublePlusOne = 2
+	};
+
 	struct FontToSprite {
 		int8 sprite;
 		int8 base;
@@ -193,8 +199,8 @@ public:
 
 	void initSpriteSurf(int16 index, int16 width, int16 height, int16 flags);
 	void freeSprite(int16 index);
-	void adjustCoords(char adjust, int16 *coord1, int16 *coord2);
-	void adjustCoords(char adjust, uint16 *coord1, uint16 *coord2) {
+	void adjustCoords(AdjustOp adjust, int16 *coord1, int16 *coord2);
+	void adjustCoords(AdjustOp adjust, uint16 *coord1, uint16 *coord2) {
 		adjustCoords(adjust, (int16 *)coord1, (int16 *)coord2);
 	}
 	void resizeCursors(int16 width, int16 height, int16 count, bool transparency);

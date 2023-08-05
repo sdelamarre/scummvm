@@ -342,7 +342,7 @@ void Inter_v1::o1_initCursor() {
 	if (height < 16)
 		height = 16;
 
-	_vm->_draw->adjustCoords(0, &width, &height);
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &width, &height);
 
 	count = _vm->_game->_script->readInt16();
 
@@ -747,7 +747,7 @@ void Inter_v1::o1_loadCursor(OpFuncParams &params) {
 
 	int16 width = resource->getWidth();
 	int16 height = resource->getHeight();
-	_vm->_draw->adjustCoords(0, &width, &height);
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &width, &height);
 
 	_vm->_video->drawPackedSprite(resource->getData(),
 			width, height,
@@ -1516,7 +1516,7 @@ void Inter_v1::o1_createSprite(OpFuncParams &params) {
 		height = _vm->_game->_script->readValExpr();
 	}
 
-	_vm->_draw->adjustCoords(0, &width, &height);
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &width, &height);
 	flag = _vm->_game->_script->readInt16();
 	_vm->_draw->initSpriteSurf(index, width, height, flag ? 2 : 0);
 }
@@ -1797,7 +1797,7 @@ void Inter_v1::o1_istrlen(OpFuncParams &params) {
 void Inter_v1::o1_setMousePos(OpFuncParams &params) {
 	_vm->_global->_inter_mouseX = _vm->_game->_script->readValExpr();
 	_vm->_global->_inter_mouseY = _vm->_game->_script->readValExpr();
-	_vm->_draw->adjustCoords(0, &_vm->_global->_inter_mouseX, &_vm->_global->_inter_mouseY);
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &_vm->_global->_inter_mouseX, &_vm->_global->_inter_mouseY);
 	_vm->_global->_inter_mouseX -= _vm->_video->_scrollOffsetX;
 	_vm->_global->_inter_mouseY -= _vm->_video->_scrollOffsetY;
 	if (_vm->_global->_useMouse != 0)

@@ -162,7 +162,7 @@ void Inter::storeMouse() {
 
 	x = _vm->_global->_inter_mouseX;
 	y = _vm->_global->_inter_mouseY;
-	_vm->_draw->adjustCoords(1, &x, &y);
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &x, &y);
 
 	WRITE_VAR(2, x);
 	WRITE_VAR(3, y);

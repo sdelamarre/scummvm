@@ -92,10 +92,10 @@ void Draw_Playtoons::spriteOperation(int16 operation) {
 
 	}
 
-	adjustCoords(0, &_destSpriteX, &_destSpriteY);
+	adjustCoords(AdjustOp::kDouble, &_destSpriteX, &_destSpriteY);
 	if ((operation != DRAW_LOADSPRITE) && (_needAdjust != 2)) {
-		adjustCoords(0, &_spriteRight, &_spriteBottom);
-		adjustCoords(0, &_spriteLeft, &_spriteTop);
+		adjustCoords(AdjustOp::kDouble, &_spriteRight, &_spriteBottom);
+		adjustCoords(AdjustOp::kDouble, &_spriteLeft, &_spriteTop);
 
 		if (operation == DRAW_DRAWLINE) {
 			if ((_spriteRight == _destSpriteX) || (_spriteBottom == _destSpriteY)) {
@@ -395,7 +395,7 @@ void Draw_Playtoons::spriteOperation(int16 operation) {
 
 	if (operation == DRAW_PRINTTEXT) {
 		len = _fonts[_fontIndex]->getCharWidth();
-		adjustCoords(1, &len, nullptr);
+		adjustCoords(AdjustOp::kHalf, &len, nullptr);
 		_destSpriteX += len * strlen(_textToPrint);
 	}
 

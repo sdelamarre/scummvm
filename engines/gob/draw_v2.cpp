@@ -394,17 +394,17 @@ void Draw_v2::printTotText(int16 id) {
 			str[MAX(strPos, strPos2)] = 0;
 			strPosBak = strPos;
 			width = strlen(str) * _fonts[fontIndex]->getCharWidth();
-			adjustCoords(1, &width, nullptr);
+			adjustCoords(AdjustOp::kHalf, &width, nullptr);
 
 			if (colCmd & 0x0F) {
 				rectLeft = offX - 2;
 				rectTop = offY - 2;
 				rectRight = offX + width + 1;
 				rectBottom = _fonts[fontIndex]->getCharHeight();
-				adjustCoords(1, &rectBottom, nullptr);
+				adjustCoords(AdjustOp::kHalf, &rectBottom, nullptr);
 				rectBottom += offY + 1;
-				adjustCoords(0, &rectLeft, &rectTop);
-				adjustCoords(2, &rectRight, &rectBottom);
+				adjustCoords(AdjustOp::kDouble, &rectLeft, &rectTop);
+				adjustCoords(AdjustOp::kDoublePlusOne, &rectRight, &rectBottom);
 
 				if (colId != -1)
 					_vm->_game->_hotspots->add(colId + 0xD000, rectLeft, rectTop,
@@ -448,7 +448,7 @@ void Draw_v2::printTotText(int16 id) {
 
 					rectLeft = _fonts[fontIndex]->getCharWidth();
 					rectTop = _fonts[fontIndex]->getCharHeight();
-					adjustCoords(1, &rectLeft, &rectTop);
+					adjustCoords(AdjustOp::kHalf, &rectLeft, &rectTop);
 					_destSpriteX = strPos * rectLeft + offX;
 					_spriteRight = _destSpriteX + rectLeft - 1;
 					_spriteBottom = offY + rectTop;
@@ -461,7 +461,7 @@ void Draw_v2::printTotText(int16 id) {
 			for (int i = 0; i < strPosBak; i++)
 				rectLeft += _fonts[_fontIndex]->getCharWidth(str[i]);
 
-			adjustCoords(1, &rectLeft, nullptr);
+			adjustCoords(AdjustOp::kHalf, &rectLeft, nullptr);
 			offX += rectLeft;
 			strPos = 0;
 			strPos2 = -1;
@@ -519,8 +519,8 @@ void Draw_v2::printTotText(int16 id) {
 				rectRight = destX + (int16)READ_LE_UINT16(ptr + 2);
 				rectTop = destY + (int16)READ_LE_UINT16(ptr + 4);
 				rectBottom = destY + (int16)READ_LE_UINT16(ptr + 6);
-				adjustCoords(2, &rectLeft, &rectTop);
-				adjustCoords(2, &rectRight, &rectBottom);
+				adjustCoords(AdjustOp::kDoublePlusOne, &rectLeft, &rectTop);
+				adjustCoords(AdjustOp::kDoublePlusOne, &rectRight, &rectBottom);
 				_vm->_game->_hotspots->add(colId + 0x0D000, rectLeft, rectTop,
 						rectRight, rectBottom, (uint16) Hotspots::kTypeClick, 0, 0, 0, 0);
 				ptr += 8;
@@ -693,10 +693,10 @@ void Draw_v2::spriteOperation(int16 operation) {
 
 	}
 
-	adjustCoords(0, &_destSpriteX, &_destSpriteY);
+	adjustCoords(AdjustOp::kDouble, &_destSpriteX, &_destSpriteY);
 	if ((operation != DRAW_LOADSPRITE) && (_needAdjust != 2)) {
-		adjustCoords(0, &_spriteRight, &_spriteBottom);
-		adjustCoords(0, &_spriteLeft, &_spriteTop);
+		adjustCoords(AdjustOp::kDouble, &_spriteRight, &_spriteBottom);
+		adjustCoords(AdjustOp::kDouble, &_spriteLeft, &_spriteTop);
 
 		if (operation == DRAW_DRAWLINE) {
 			if ((_spriteRight == _destSpriteX) || (_spriteBottom == _destSpriteY)) {
@@ -792,7 +792,7 @@ void Draw_v2::spriteOperation(int16 operation) {
 			break;
 
 		if (_vm->_draw->_needAdjust == 3 || _vm->_draw->_needAdjust == 4)
-			adjustCoords(0, &_spriteRight, &_spriteBottom);
+			adjustCoords(AdjustOp::kDouble, &_spriteRight, &_spriteBottom);
 
 		_vm->_video->drawPackedSprite(resource->getData(),
 				_spriteRight, _spriteBottom, _destSpriteX, _destSpriteY,

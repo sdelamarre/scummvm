@@ -359,7 +359,7 @@ void Inter_v2::o2_initMult() {
 		_vm->_mult->_animSurf.reset();
 	}
 
-	_vm->_draw->adjustCoords(0,
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble,
 			&_vm->_mult->_animWidth, &_vm->_mult->_animHeight);
 	if (!_vm->_mult->_animSurf) {
 		_vm->_draw->initSpriteSurf(Draw::kAnimSurface, _vm->_mult->_animWidth,
@@ -369,7 +369,7 @@ void Inter_v2::o2_initMult() {
 			return;
 	}
 
-	_vm->_draw->adjustCoords(1,
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf,
 			&_vm->_mult->_animWidth, &_vm->_mult->_animHeight);
 	_vm->_draw->_sourceSurface = Draw::kBackSurface;
 	_vm->_draw->_destSurface = Draw::kAnimSurface;
@@ -1189,8 +1189,8 @@ void Inter_v2::o2_addHotspot(OpFuncParams &params) {
 	if (key == 0)
 		key = ABS(id) + 41960;
 
-	_vm->_draw->adjustCoords(0, &left, &top);
-	_vm->_draw->adjustCoords(2, &width, &height);
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &left, &top);
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDoublePlusOne, &width, &height);
 
 	if (left < 0) {
 		width += left;

@@ -570,7 +570,7 @@ void Mult_v2::playMultInit() {
 
 		width = _animWidth;
 		height = _animHeight;
-		_vm->_draw->adjustCoords(0, &width, &height);
+		_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &width, &height);
 		_vm->_draw->initSpriteSurf(Draw::kAnimSurface, width, height, 0);
 		_animSurf = _vm->_draw->_spritesArray[Draw::kAnimSurface];
 

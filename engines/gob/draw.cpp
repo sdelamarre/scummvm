@@ -340,26 +340,26 @@ void Draw::freeSprite(int16 index) {
 		_spritesArray[index] = _backSurface;
 }
 
-void Draw::adjustCoords(char adjust, int16 *coord1, int16 *coord2) {
+void Draw::adjustCoords(AdjustOp adjust, int16 *coord1, int16 *coord2) {
 	if (_needAdjust == 2 || _needAdjust == 10)
 		return;
 
 	switch (adjust) {
-		case 0:
+		case AdjustOp::kDouble:
 			if (coord2)
 				*coord2 *= 2;
 			if (coord1)
 				*coord1 *= 2;
 			break;
 
-		case 1:
+		case AdjustOp::kHalf:
 			if (coord2)
 				*coord2 = (signed) ((unsigned) (*coord2 + 1) / 2);
 			if (coord1)
 				*coord1 = (signed) ((unsigned) (*coord1 + 1) / 2);
 			break;
 
-		case 2:
+		case AdjustOp::kDoublePlusOne:
 			if (coord2)
 				*coord2 = *coord2 * 2 + 1;
 			if (coord1)
@@ -454,8 +454,8 @@ int Draw::stringLength(const char *str, uint16 fontIndex) {
 void Draw::printTextCentered(int16 id, int16 left, int16 top, int16 right,
 		int16 bottom, const char *str, int16 fontIndex, int16 color) {
 
-	adjustCoords(1, &left, &top);
-	adjustCoords(1, &right, &bottom);
+	adjustCoords(AdjustOp::kHalf, &left, &top);
+	adjustCoords(AdjustOp::kHalf, &right, &bottom);
 
 	uint16 centerOffset = _vm->_game->_script ? _vm->_game->_script->getFunctionOffset(TOTFile::kFunctionCenter) : 0;
 	if (centerOffset != 0) {
@@ -500,7 +500,7 @@ void Draw::printTextCentered(int16 id, int16 left, int16 top, int16 right,
 	else
 		width = strlen(str) * font.getCharWidth();
 
-	adjustCoords(1, &width, nullptr);
+	adjustCoords(AdjustOp::kHalf, &width, nullptr);
 	_destSpriteX += (right - left + 1 - width) / 2;
 
 	spriteOperation(DRAW_PRINTTEXT);
@@ -513,8 +513,8 @@ void Draw::oPlaytoons_sub_F_1B(uint16 id, int16 left, int16 top, int16 right, in
 	char tmpStr[128];
 
 	Common::strlcpy(tmpStr, paramStr, 128);
-	adjustCoords(1, &left, &top);
-	adjustCoords(1, &right,  &bottom);
+	adjustCoords(AdjustOp::kHalf, &left, &top);
+	adjustCoords(AdjustOp::kHalf, &right,  &bottom);
 
 	uint16 centerOffset = _vm->_game->_script ? _vm->_game->_script->getFunctionOffset(TOTFile::kFunctionCenter) : 0;
 	if (centerOffset != 0) {
@@ -578,7 +578,7 @@ void Draw::oPlaytoons_sub_F_1B(uint16 id, int16 left, int16 top, int16 right, in
 				_destSpriteY = offY;
 				_textToPrint = str;
 				width = stringLength(str, fontIndex);
-				adjustCoords(1, &width, nullptr);
+				adjustCoords(AdjustOp::kHalf, &width, nullptr);
 				_destSpriteX += (top - left + 1 - width) / 2;
 				spriteOperation(DRAW_PRINTTEXT);
 				offY += deltaY + _fonts[fontIndex]->getCharHeight();
@@ -591,7 +591,7 @@ void Draw::oPlaytoons_sub_F_1B(uint16 id, int16 left, int16 top, int16 right, in
 				_destSpriteY = right;
 			_textToPrint = paramStr;
 			width = stringLength(paramStr, fontIndex);
-			adjustCoords(1, &width, nullptr);
+			adjustCoords(AdjustOp::kHalf, &width, nullptr);
 			_destSpriteX += (top - left + 1 - width) / 2;
 			spriteOperation(DRAW_PRINTTEXT);
 		}

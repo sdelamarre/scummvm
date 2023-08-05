@@ -1069,7 +1069,7 @@ void Inter_v7::o7_printText(OpFuncParams &params) {
 		if (_vm->_game->_script->peekByte() == 200) {
 			_vm->_draw->_spriteBottom = _vm->_draw->_fonts[_vm->_draw->_fontIndex]->getCharHeight();
 			_vm->_draw->_spriteRight = _vm->_draw->stringLength(_vm->_draw->_textToPrint, _vm->_draw->_fontIndex);
-			_vm->_draw->adjustCoords(1, &_vm->_draw->_spriteBottom, &_vm->_draw->_spriteRight);
+			_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &_vm->_draw->_spriteBottom, &_vm->_draw->_spriteRight);
 			if (_vm->_draw->_transparency == 0) {
 				_vm->_draw->spriteOperation(DRAW_FILLRECT);
 				_vm->_draw->_transparency = 1;
