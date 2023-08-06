@@ -280,8 +280,8 @@ void Mult_v1::playMultInit() {
 		_vm->_util->setFrameRate(_multData->frameRate);
 		_animTop = 0;
 		_animLeft = 0;
-		_animWidth = 320;
-		_animHeight = 200;
+		_animWidth = _vm->_video->_surfWidth;
+		_animHeight = _vm->_video->_surfHeight;
 		_objCount = 4;
 
 		delete[] _renderData;
@@ -311,10 +311,10 @@ void Mult_v1::playMultInit() {
 			multObj.lastBottom = -1;
 		}
 
-		_animSurf = _vm->_video->initSurfDesc(320, 200);
+		_animSurf = _vm->_video->initSurfDesc(_vm->_video->_surfWidth, _vm->_video->_surfHeight);
 		_vm->_draw->_spritesArray[Draw::kAnimSurface] = _animSurf;
 
-		_animSurf->blit(*_vm->_draw->_backSurface, 0, 0, 319, 199, 0, 0);
+		_animSurf->blit(*_vm->_draw->_backSurface, 0, 0, _vm->_video->_surfWidth - 1, _vm->_video->_surfHeight - 1, 0, 0);
 
 		_animDataAllocated = true;
 	} else
@@ -343,7 +343,7 @@ void Mult_v1::drawStatics(bool &stop) {
 
 		_vm->_scenery->_curStatic = _multData->staticIndices[_vm->_scenery->_curStatic];
 		_vm->_scenery->renderStatic(_vm->_scenery->_curStatic, _vm->_scenery->_curStaticLayer);
-		_animSurf->blit(*_vm->_draw->_backSurface, 0, 0, 319, 199, 0, 0);
+		_animSurf->blit(*_vm->_draw->_backSurface, 0, 0, _vm->_video->_surfWidth - 1, _vm->_video->_surfHeight - 1, 0, 0);
 	}
 }
 

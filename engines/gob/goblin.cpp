@@ -261,9 +261,9 @@ void Goblin::drawObjects() {
 		}
 
 		objDesc->dirtyLeft = 0;
-		objDesc->dirtyRight = 319;
+		objDesc->dirtyRight = _vm->_video->_surfWidth - 1;
 		objDesc->dirtyTop = 0;
-		objDesc->dirtyBottom = 199;
+		objDesc->dirtyBottom = _vm->_video->_surfHeight - 1;
 	}
 
 	sortByOrder(_objList);
