@@ -89,6 +89,13 @@ void Init::initGame() {
 			_vm->_dataIO->openArchive(_vm->_startStk, true);
 	}
 
+	if (_vm->_hardcodedDisk1234StkLoading) {
+		_vm->_dataIO->openArchive("DISK1.STK", true);
+		_vm->_dataIO->openArchive("DISK2.STK", true);
+		_vm->_dataIO->openArchive("DISK3.STK", true);
+		_vm->_dataIO->openArchive("DISK4.STK", true);
+	}
+
 	_vm->_util->initInput();
 
 	_vm->_video->initPrimary(_vm->_global->_videoMode);

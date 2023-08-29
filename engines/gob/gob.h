@@ -166,6 +166,7 @@ public:
 
 	Common::String _startStk;
 	Common::String _startTot;
+	bool _hardcodedDisk1234StkLoading; // Open archives DISK[1-4].STK at startup
 	uint32 _demoIndex;
 
 	bool _copyProtection;

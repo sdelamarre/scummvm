@@ -74,6 +74,7 @@ enum Features {
 enum AdditionalGameFlags {
 	GF_ENABLE_ADIBOU2_FREE_BANANAS_WORKAROUND = 1 << 0,
 	GF_ENABLE_ADIBOU2_FLOWERS_INFINITE_LOOP_WORKAROUND = 1 << 1,
+	GF_HARDCODED_DISK_1_4_STK_LOADING = 1 << 2,
 };
 
 struct GOBGameDescription {

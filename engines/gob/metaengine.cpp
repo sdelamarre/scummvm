@@ -87,6 +87,7 @@ void GobEngine::initGame(const GOBGameDescription *gd) {
 	_language = gd->desc.language;
 	_platform = gd->desc.platform;
 
+	_hardcodedDisk1234StkLoading = gd->desc.flags & GF_HARDCODED_DISK_1_4_STK_LOADING;
 	_enableAdibou2FreeBananasWorkaround = gd->desc.flags & GF_ENABLE_ADIBOU2_FREE_BANANAS_WORKAROUND;
 	_enableAdibou2FlowersInfiniteLoopWorkaround = gd->desc.flags & GF_ENABLE_ADIBOU2_FLOWERS_INFINITE_LOOP_WORKAROUND;
 }
