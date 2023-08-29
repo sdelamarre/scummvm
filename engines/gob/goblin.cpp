@@ -150,10 +150,14 @@ int16 Goblin::peekGoblin(Gob_Object *_curGob) {
 				if (desc != _goblins[i])
 					continue;
 
-				if ((_vm->_global->_inter_mouseX < desc->right) &&
-				    (_vm->_global->_inter_mouseX > desc->left) &&
-				    (_vm->_global->_inter_mouseY < desc->bottom) &&
-				    (_vm->_global->_inter_mouseY > desc->top)) {
+				int16 mouseX = _vm->_global->_inter_mouseX;
+				int16 mouseY = _vm->_global->_inter_mouseY;
+				_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &mouseX, &mouseY);
+
+				if ((mouseX < desc->right) &&
+				    (mouseX > desc->left) &&
+				    (mouseY < desc->bottom) &&
+				    (mouseY > desc->top)) {
 					index = i + 1;
 				}
 			}
@@ -228,12 +232,18 @@ void Goblin::drawObjects() {
 		if (objDesc->toRedraw == 0)
 			continue;
 
+		_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &objDesc->left, &objDesc->top);
+		_vm->_draw->adjustCoords(Draw::AdjustOp::kDoublePlusOne, &objDesc->right, &objDesc->bottom);
 		_vm->_draw->_backSurface->blit(*_vm->_mult->_animSurf,
 		    objDesc->left, objDesc->top, objDesc->right,
 		    objDesc->bottom, objDesc->left, objDesc->top);
 
 		_vm->_draw->invalidateRect(objDesc->left, objDesc->top,
 		    objDesc->right, objDesc->bottom);
+
+		_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &objDesc->left, &objDesc->top);
+		_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &objDesc->right, &objDesc->bottom);
+
 
 		if (objDesc->type != 0)
 			continue;
@@ -293,10 +303,14 @@ void Goblin::drawObjects() {
 					objDesc->right = 0;
 					objDesc->bottom = 0;
 				} else {
+					_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &_vm->_scenery->_toRedrawLeft, &_vm->_scenery->_toRedrawTop);
+					_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &_vm->_scenery->_toRedrawRight, &_vm->_scenery->_toRedrawBottom);
 					_vm->_draw->invalidateRect(_vm->_scenery->_toRedrawLeft,
 					    _vm->_scenery->_toRedrawTop,
 					    _vm->_scenery->_toRedrawRight,
 					    _vm->_scenery->_toRedrawBottom);
+					_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &_vm->_scenery->_toRedrawLeft, &_vm->_scenery->_toRedrawTop);
+					_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &_vm->_scenery->_toRedrawRight, &_vm->_scenery->_toRedrawBottom);
 
 					objDesc->left = _vm->_scenery->_toRedrawLeft;
 					objDesc->top = _vm->_scenery->_toRedrawTop;
@@ -977,10 +991,15 @@ void Goblin::moveFindItem(int16 posX, int16 posY) {
 
 void Goblin::moveCheckSelect(int16 framesCount, Gob_Object *gobDesc,
 		int16 *pGobIndex, int16 *nextAct) {
-	if ((gobDesc->right > _vm->_global->_inter_mouseX) &&
-	    (gobDesc->left < _vm->_global->_inter_mouseX) &&
-	    (gobDesc->bottom > _vm->_global->_inter_mouseY) &&
-	    ((gobDesc->bottom - 10) < _vm->_global->_inter_mouseY) &&
+
+	int16 mouseX = _vm->_global->_inter_mouseX;
+	int16 mouseY = _vm->_global->_inter_mouseY;
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &mouseX, &mouseY);
+
+	if ((gobDesc->right > mouseX) &&
+	    (gobDesc->left < mouseX) &&
+	    (gobDesc->bottom > mouseY) &&
+	    ((gobDesc->bottom - 10) < mouseY) &&
 			(_gobAction == 0)) {
 		if (gobDesc->curLookDir & 4)
 			*nextAct = 16;
@@ -1023,15 +1042,19 @@ void Goblin::moveInitStep(int16 framesCount, int16 action, int16 cont,
 		_forceNextState[1] = -1;
 		_forceNextState[2] = -1;
 
+		int16 mouseX = _vm->_global->_inter_mouseX;
+		int16 mouseY = _vm->_global->_inter_mouseY;
+		_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &mouseX, &mouseY);
+
 		if (action == 3) {
-			posX = _vm->_global->_inter_mouseX + 6;
-			posY = _vm->_global->_inter_mouseY + 7;
+			posX = mouseX + 6;
+			posY = mouseY + 7;
 		} else if (action == 4) {
-			posX = _vm->_global->_inter_mouseX + 7;
-			posY = _vm->_global->_inter_mouseY + 12;
+			posX = mouseX + 7;
+			posY = mouseY + 12;
 		} else {
-			posX = _vm->_global->_inter_mouseX;
-			posY = _vm->_global->_inter_mouseY;
+			posX = mouseX;
+			posY = mouseY;
 		}
 
 		moveFindItem(posX, posY);
@@ -1794,6 +1817,7 @@ void Goblin::move(int16 destX, int16 destY, int16 objIndex) {
 		if ((destX == -1) && (destY == -1)) {
 			int16 mouseX = _vm->_global->_inter_mouseX;
 			int16 mouseY = _vm->_global->_inter_mouseY;
+			_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf, &mouseX, &mouseY);
 
 			if (_vm->_map->hasBigTiles())
 				mouseY += ((_vm->_global->_inter_mouseY / _vm->_map->getTilesHeight()) + 1) / 2;

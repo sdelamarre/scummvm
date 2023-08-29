@@ -141,4 +141,127 @@ char Video_v1::spriteUncompressor(byte *sprBuf, int16 srcWidth, int16 srcHeight,
 	return 1;
 }
 
+char Video_v1::spriteUncompressorDouble(byte *sprBuf, int16 srcWidth, int16 srcHeight,
+										int16 x, int16 y, int16 transp, Surface &destDesc) {
+	byte *memBuffer;
+	byte *srcPtr;
+	byte temp;
+	uint16 sourceLeft;
+	uint16 cmdVar;
+	int16 curWidth, curHeight;
+	int16 offset;
+	int16 counter2;
+	int16 bufPos;
+	int16 strLen;
+
+	x *= 2;
+	y *= 2;
+
+	if (sprBuf[0] != 1)
+		return 0;
+
+	if (sprBuf[1] != 2)
+		return 0;
+
+	if (sprBuf[2] == 2) {
+		Surface sourceDesc(srcWidth, srcHeight, 1, sprBuf + 3);
+		destDesc.blitScaled(sourceDesc, 0, 0, srcWidth - 1, srcHeight - 1, x, y, 2, (transp == 0) ? -1 : 0);
+		return 1;
+	} else {
+		memBuffer = new byte[4114];
+		assert(memBuffer);
+
+		srcPtr = sprBuf + 3;
+		sourceLeft = READ_LE_UINT16(srcPtr);
+
+		Pixel destPtr = destDesc.get(x, y);
+
+		curWidth = 0;
+		curHeight = 0;
+
+		Pixel linePtr = destPtr;
+		srcPtr += 4;
+
+		for (offset = 0; offset < 4078; offset++)
+			memBuffer[offset] = 0x20;
+
+		cmdVar = 0;
+		bufPos = 4078;
+		while (1) {
+			cmdVar >>= 1;
+			if ((cmdVar & 0x100) == 0) {
+				cmdVar = *srcPtr | 0xFF00;
+				srcPtr++;
+			}
+			if ((cmdVar & 1) != 0) {
+				temp = *srcPtr++;
+				if ((temp != 0) || (transp == 0)) {
+					destPtr.set(temp);
+					Pixel destPtr2 = destPtr;
+					(++destPtr2).set(temp);
+					(destPtr2 += destDesc.getWidth() - 1).set(temp);
+					(++destPtr2).set(temp);
+				}
+				destPtr += 2;
+				curWidth++;
+				if (curWidth >= srcWidth) {
+					curWidth = 0;
+					linePtr += 2 * destDesc.getWidth();
+					destPtr = linePtr;
+					curHeight++;
+					if (curHeight >= srcHeight)
+						break;
+				}
+				sourceLeft--;
+				if (sourceLeft == 0)
+					break;
+
+				memBuffer[bufPos] = temp;
+				bufPos++;
+				bufPos %= 4096;
+			} else {
+				offset = *srcPtr;
+				srcPtr++;
+				offset |= (*srcPtr & 0xF0) << 4;
+				strLen = (*srcPtr & 0x0F) + 3;
+				srcPtr++;
+
+				for (counter2 = 0; counter2 < strLen; counter2++) {
+					temp = memBuffer[(offset + counter2) % 4096];
+					if ((temp != 0) || (transp == 0)) {
+						destPtr.set(temp);
+						Pixel destPtr2 = destPtr;
+						(++destPtr2).set(temp);
+						(destPtr2 += destDesc.getWidth() - 1).set(temp);
+						(++destPtr2).set(temp);
+					}
+					destPtr += 2;
+
+					curWidth++;
+					if (curWidth >= srcWidth) {
+						curWidth = 0;
+						linePtr += 2 * destDesc.getWidth();
+						destPtr = linePtr;
+						curHeight++;
+						if (curHeight >= srcHeight) {
+							delete[] memBuffer;
+							return 1;
+						}
+					}
+					sourceLeft--;
+					if (sourceLeft == 0) {
+						delete[] memBuffer;
+						return 1;
+					}
+					memBuffer[bufPos] = temp;
+					bufPos++;
+					bufPos %= 4096;
+				}
+			}
+		}
+	}
+	delete[] memBuffer;
+	return 1;
+}
+
 } // End of namespace Gob

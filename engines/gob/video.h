@@ -122,6 +122,9 @@ public:
 			int16 x, int16 y, int16 transp, Surface &dest);
 	void drawPackedSprite(const char *path, Surface &dest, int width = 320);
 
+	void drawPackedSpriteDouble(byte *sprBuf, int16 width, int16 height,
+								int16 x, int16 y, int16 transp, Surface &dest);
+
 	void setPalColor(byte *pal, byte red, byte green, byte blue) {
 		pal[0] = red << 2;
 		pal[1] = green << 2;
@@ -144,6 +147,9 @@ public:
 	virtual char spriteUncompressor(byte *sprBuf, int16 srcWidth,
 			int16 srcHeight, int16 x, int16 y, int16 transp,
 			Surface &destDesc) = 0;
+	virtual char spriteUncompressorDouble(byte *sprBuf, int16 srcWidth,
+										  int16 srcHeight, int16 x, int16 y, int16 transp,
+										  Surface &destDesc) = 0;
 
 	Video(class GobEngine *vm);
 	virtual ~Video();
@@ -158,12 +164,15 @@ protected:
 	GobEngine *_vm;
 
 	void drawPacked(byte *sprBuf, int16 width, int16 height, int16 x, int16 y, byte transp, Surface &dest);
+	void drawPackedDouble(byte *sprBuf, int16 width, int16 height, int16 x, int16 y, byte transp, Surface &dest);
 };
 
 class Video_v1 : public Video {
 public:
 	char spriteUncompressor(byte *sprBuf, int16 srcWidth, int16 srcHeight,
 			int16 x, int16 y, int16 transp, Surface &destDesc) override;
+	char spriteUncompressorDouble(byte *sprBuf, int16 srcWidth, int16 srcHeight,
+								  int16 x, int16 y, int16 transp, Surface &destDesc) override;
 
 	Video_v1(GobEngine *vm);
 	~Video_v1() override {}

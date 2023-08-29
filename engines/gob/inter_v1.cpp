@@ -514,6 +514,8 @@ void Inter_v1::o1_initMult() {
 		_vm->_mult->_animSurf.reset();
 	}
 
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble,
+							 &_vm->_mult->_animWidth, &_vm->_mult->_animHeight);
 	if (!_vm->_mult->_animSurf) {
 		_vm->_draw->initSpriteSurf(Draw::kAnimSurface, _vm->_mult->_animWidth,
 				_vm->_mult->_animHeight, 0);
@@ -524,6 +526,9 @@ void Inter_v1::o1_initMult() {
 	    _vm->_mult->_animLeft, _vm->_mult->_animTop,
 	    _vm->_mult->_animLeft + _vm->_mult->_animWidth - 1,
 	    _vm->_mult->_animTop + _vm->_mult->_animHeight - 1, 0, 0);
+
+	_vm->_draw->adjustCoords(Draw::AdjustOp::kHalf,
+							 &_vm->_mult->_animWidth, &_vm->_mult->_animHeight);
 
 	debugC(4, kDebugGraphics, "o1_initMult: x = %d, y = %d, w = %d, h = %d",
 		  _vm->_mult->_animLeft, _vm->_mult->_animTop,
@@ -747,7 +752,8 @@ void Inter_v1::o1_loadCursor(OpFuncParams &params) {
 
 	int16 width = resource->getWidth();
 	int16 height = resource->getHeight();
-	_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &width, &height);
+	if (_vm->_draw->_needAdjust == 3 || _vm->_draw->_needAdjust == 4)
+		_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &width, &height);
 
 	_vm->_video->drawPackedSprite(resource->getData(),
 			width, height,

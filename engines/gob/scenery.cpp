@@ -175,6 +175,9 @@ int16 Scenery::loadStatic(char search) {
 
 		width    = _vm->_game->_script->readInt16();
 		height   = _vm->_game->_script->readInt16();
+
+		_vm->_draw->adjustCoords(Draw::AdjustOp::kDouble, &width, &height);
+
 		sprResId = _vm->_game->_script->readInt16();
 		for (sprIndex = 0; sprIndex < 20; sprIndex++) {
 			if (_spriteResId[sprIndex] == sprResId)

@@ -302,6 +302,55 @@ void Video::sparseRetrace(int max) {
 	_lastSparse = timeKey;
 }
 
+void Video::drawPackedDouble(byte *sprBuf, int16 width, int16 height,
+							 int16 x, int16 y, byte transp, Surface &dest) {
+
+	x *= 2;
+	y *= 2;
+
+	int destRight = x + 2 * width;
+	int destBottom = y + 2 * height;
+
+	Pixel dst = dest.get(x, y);
+
+	int curx = x;
+	int cury = y;
+
+	while (1) {
+		uint8 val = *sprBuf++;
+		unsigned int repeat = val & 7;
+		val &= 0xF8;
+
+		if (!(val & 8)) {
+			repeat <<= 8;
+			repeat |= *sprBuf++;
+		}
+		repeat++;
+		val >>= 4;
+
+		for (unsigned int i = 0; i < repeat; ++i) {
+			if (curx < dest.getWidth() && cury < dest.getHeight())
+				if (!transp || val) {
+					dst.set(val);
+					Pixel destPtr2 = dst;
+					(++destPtr2).set(val);
+					(destPtr2 += dest.getWidth() - 1).set(val);
+					(++destPtr2).set(val);
+				}
+
+			dst += 2;
+			curx += 2;
+			if (curx == destRight) {
+				dst += 2 * dest.getWidth() + x - curx;
+				curx = x;
+				cury += 2;
+				if (cury == destBottom)
+					return;
+			}
+		}
+	}
+}
+
 void Video::drawPacked(byte *sprBuf, int16 width, int16 height,
 		int16 x, int16 y, byte transp, Surface &dest) {
 
@@ -363,6 +412,15 @@ void Video::drawPackedSprite(const char *path, Surface &dest, int width) {
 
 	drawPackedSprite(data, width, dest.getHeight(), 0, 0, 0, dest);
 	delete[] data;
+}
+
+void Video::drawPackedSpriteDouble(byte *sprBuf, int16 width, int16 height,
+								   int16 x, int16 y, int16 transp, Surface &dest) {
+
+	if (spriteUncompressorDouble(sprBuf, width, height, x, y, transp, dest))
+		return;
+
+	drawPackedDouble(sprBuf, width, height, x, y, transp, dest);
 }
 
 void Video::setPalElem(int16 index, char red, char green, char blue,

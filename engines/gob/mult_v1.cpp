@@ -280,8 +280,10 @@ void Mult_v1::playMultInit() {
 		_vm->_util->setFrameRate(_multData->frameRate);
 		_animTop = 0;
 		_animLeft = 0;
-		_animWidth = _vm->_video->_surfWidth;
-		_animHeight = _vm->_video->_surfHeight;
+		_animWidth = 320; // Keep 320x200 here to match the game scripts logic.
+						  // But actual allocated sprite may be doubled for
+						  // 640x480 versions.
+		_animHeight = 200;
 		_objCount = 4;
 
 		delete[] _renderData;

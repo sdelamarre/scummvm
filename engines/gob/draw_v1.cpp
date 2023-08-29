@@ -341,6 +341,14 @@ void Draw_v1::spriteOperation(int16 operation) {
 		}
 	}
 
+
+	if (operation != DRAW_LOADSPRITE) {
+		adjustCoords(AdjustOp::kDouble, &_spriteLeft, &_spriteTop);
+		adjustCoords(AdjustOp::kDouble, &_spriteRight, &_spriteBottom);
+		adjustCoords(AdjustOp::kDouble, &_destSpriteX, &_destSpriteY);
+	}
+
+
 	Font *font = nullptr;
 	switch (operation) {
 	case DRAW_BLITSURF:
@@ -388,12 +396,26 @@ void Draw_v1::spriteOperation(int16 operation) {
 		if (!resource)
 			break;
 
-		_vm->_video->drawPackedSprite(resource->getData(),
-				_spriteRight, _spriteBottom, _destSpriteX, _destSpriteY,
-				_transparency, *_spritesArray[_destSurface]);
+		if (_needAdjust == 0 &&
+			// TODO: hacky way to distinguish sprites needing to be doubled
+			// from those that do not. Check if there is an explicit
+			// "need double" flag somewhere in the original engine.
+			_destSpriteX + _spriteRight <= 320 &&
+			_destSpriteY + _spriteBottom <= 200) {
+			_vm->_video->drawPackedSpriteDouble(resource->getData(),
+												_spriteRight, _spriteBottom, _destSpriteX, _destSpriteY,
+												_transparency, *_spritesArray[_destSurface]);
+			dirtiedRect(_destSurface, 2 * _destSpriteX, 2 * _destSpriteY,
+						2 * (_destSpriteX + _spriteRight - 1), 2 * (_destSpriteY + _spriteBottom - 1));
+		}
+		else {
+			_vm->_video->drawPackedSprite(resource->getData(),
+										  _spriteRight, _spriteBottom, _destSpriteX, _destSpriteY,
+										  _transparency, *_spritesArray[_destSurface]);
 
-		dirtiedRect(_destSurface, _destSpriteX, _destSpriteY,
-				_destSpriteX + _spriteRight - 1, _destSpriteY + _spriteBottom - 1);
+			dirtiedRect(_destSurface, _destSpriteX, _destSpriteY,
+						_destSpriteX + _spriteRight - 1, _destSpriteY + _spriteBottom - 1);
+		}
 
 		delete resource;
 		break;
@@ -489,6 +511,12 @@ void Draw_v1::spriteOperation(int16 operation) {
 
 	default:
 		break;
+	}
+
+	if (operation != DRAW_LOADSPRITE) {
+		adjustCoords(AdjustOp::kHalf, &_spriteLeft, &_spriteTop);
+		adjustCoords(AdjustOp::kHalf, &_spriteRight, &_spriteBottom);
+		adjustCoords(AdjustOp::kHalf, &_destSpriteX, &_destSpriteY);
 	}
 
 	if (_renderFlags & RENDERFLAG_USEDELTAS) {

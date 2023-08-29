@@ -581,6 +581,10 @@ void Game::playTot(int16 function) {
 				if (_vm->_draw->_needAdjust <= 1 || _vm->_draw->_needAdjust >= 8)
 					_vm->_draw->_needAdjust = 2;
 			}
+			else if (_vm->getGameType() == kGameTypeGob1 &&
+					 (_vm->is640x400() || _vm->is640x480())) {
+				_vm->_draw->_needAdjust = 0;
+			}
 
 			_resources->load(_curTotFile);
 
