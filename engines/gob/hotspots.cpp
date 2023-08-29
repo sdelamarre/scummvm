@@ -933,6 +933,8 @@ uint16 Hotspots::updateInput(uint16 xPos, uint16 yPos, uint16 width, uint16 heig
 			Common::strlcpy(tempStr, str, 256);
 
 		// Clear input area
+		int16 savedNeedAdjust = _vm->_draw->_needAdjust;
+		_vm->_draw->_needAdjust = 10;
 		fillRect(xPos, yPos,
 		         font.isMonospaced() ? (editSize * font.getCharWidth()) : width, height,
 		         backColor);
@@ -940,6 +942,7 @@ uint16 Hotspots::updateInput(uint16 xPos, uint16 yPos, uint16 width, uint16 heig
 		// Print the current string, vertically centered
 		printText(xPos, yPos + (height - font.getCharHeight()) / 2,
 				tempStr, fontIndex, frontColor);
+		_vm->_draw->_needAdjust = savedNeedAdjust;
 
 		// If we've reached the end of the input field, set the cursor to the last character
 		if ((editSize != 0) && (pos == editSize))
@@ -981,11 +984,14 @@ uint16 Hotspots::updateInput(uint16 xPos, uint16 yPos, uint16 width, uint16 heig
 			// Clear cursor
 			getTextCursorPos(font, str, pos, xPos, yPos, width, height,
 					cursorX, cursorY, cursorWidth, cursorHeight);
+			savedNeedAdjust = _vm->_draw->_needAdjust;
+			_vm->_draw->_needAdjust = 10;
 			fillRect(cursorX, cursorY, cursorWidth, cursorHeight, backColor);
 
 			// Print the current string, vertically centered
 			printText(cursorX, yPos + (height - font.getCharHeight()) / 2,
 					tempStr, fontIndex, frontColor);
+			_vm->_draw->_needAdjust = savedNeedAdjust;
 
 			if ((key != 0) || (id != 0))
 				// We did get a key, stop looking
@@ -2235,6 +2241,9 @@ void Hotspots::updateAllTexts(const InputDesc *inputs) const {
 		uint16 y      = spot.top;
 		uint16 width  = spot.right  - spot.left + 1;
 		uint16 height = spot.bottom - spot.top  + 1;
+
+		int16 savedNeedAdjust = _vm->_draw->_needAdjust;
+		_vm->_draw->_needAdjust = 10;
 		// Clear the background
 		fillRect(x, y, width, height, inputs[input].backColor);
 
@@ -2243,6 +2252,7 @@ void Hotspots::updateAllTexts(const InputDesc *inputs) const {
 
 		// Draw it
 		printText(x, y, tempStr, inputs[input].fontIndex, inputs[input].frontColor);
+		_vm->_draw->_needAdjust = savedNeedAdjust;
 
 		input++;
 	}
