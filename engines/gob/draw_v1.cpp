@@ -224,6 +224,9 @@ void Draw_v1::printTotText(int16 id) {
 
 		if (*ptrEnd == 2)
 			ptrEnd += 4;
+
+		if (*ptrEnd == 10)
+			ptrEnd += (ptrEnd[1] * 2) + 2;
 	}
 	ptrEnd++;
 
@@ -240,6 +243,16 @@ void Draw_v1::printTotText(int16 id) {
 			_destSpriteX = destX + READ_LE_UINT16(ptr);
 			_destSpriteY = destY + READ_LE_UINT16(ptr + 2);
 			ptr += 4;
+			continue;
+		} else if (cmd == 10) {
+			char str[80];
+			ptr++;
+			uint8 len = *ptr++;
+			memcpy(str, ptr, len * 2);
+			str[len * 2] = 0;
+			ptr += len * 2;
+			_textToPrint = str;
+			spriteOperation(DRAW_PRINTTEXT);
 			continue;
 		}
 
