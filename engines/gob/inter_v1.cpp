@@ -1016,7 +1016,9 @@ void Inter_v1::o1_printText(OpFuncParams &params) {
 	char buf[60];
 	int i;
 
-	_vm->_draw->_destSpriteX = _vm->_game->_script->readValExpr();
+	int16 destSpriteX = _vm->_game->_script->readValExpr();
+	if (destSpriteX != 1000)
+		_vm->_draw->_destSpriteX = destSpriteX;
 	_vm->_draw->_destSpriteY = _vm->_game->_script->readValExpr();
 
 	_vm->_draw->_backColor = _vm->_game->_script->readValExpr();
