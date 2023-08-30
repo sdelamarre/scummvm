@@ -232,6 +232,7 @@ protected:
 	void o1_capturePush(OpFuncParams &params);
 	void o1_capturePop(OpFuncParams &params);
 	void o1_animPalInit(OpFuncParams &params);
+	void o1_getTotTextItemPart(OpFuncParams &params);
 	void o1_drawOperations(OpFuncParams &params);
 	void o1_setcmdCount(OpFuncParams &params);
 	void o1_return(OpFuncParams &params);
@@ -438,7 +439,6 @@ protected:
 	void o2_animPalInit(OpFuncParams &params);
 	void o2_addHotspot(OpFuncParams &params);
 	void o2_removeHotspot(OpFuncParams &params);
-	void o2_getTotTextItemPart(OpFuncParams &params);
 	void o2_goblinFunc(OpFuncParams &params);
 	void o2_stopSound(OpFuncParams &params);
 	void o2_loadSound(OpFuncParams &params);
