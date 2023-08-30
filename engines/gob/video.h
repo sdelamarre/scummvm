@@ -33,7 +33,7 @@ namespace Gob {
 
 class Font {
 public:
-	Font(const byte *data);
+	Font(const byte *data, bool isCRF = false);
 	~Font();
 
 	uint8  getCharWidth (uint8 c) const;
@@ -44,8 +44,12 @@ public:
 
 	bool isMonospaced() const;
 
+	void drawLetter(Surface &surf, const byte *charData, uint16 x, uint16 y,
+					uint32 color1, uint32 color2, bool transp) const;
 	void drawLetter(Surface &surf, uint8 c, uint16 x, uint16 y,
-	                uint32 color1, uint32 color2, bool transp) const;
+					uint32 color1, uint32 color2, bool transp) const;
+	void drawLetterWideChar(Surface &surf, uint16 c, uint16 x, uint16 y,
+							uint32 color1, uint32 color2, bool transp) const;
 
 	void drawString(const Common::String &str, int16 x, int16 y, int16 color1, int16 color2,
 	                bool transp, Surface &dest) const;
@@ -57,13 +61,17 @@ private:
 
 	int8   _itemWidth;
 	int8   _itemHeight;
-	uint8  _startItem;
-	uint8  _endItem;
+	uint16  _startItem;
+	uint16  _endItem;
 	uint8  _itemSize;
 	int8   _bitWidth;
 
+	bool _isCRF;
+
 	uint16 getCharCount() const;
 	const byte *getCharData(uint8 c) const;
+	const byte *getWideCharData(uint16 wc) const;
+	Common::HashMap<uint16, const byte*> *_charDataMap;
 };
 
 class Video {

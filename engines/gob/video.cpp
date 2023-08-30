@@ -36,7 +36,7 @@
 
 namespace Gob {
 
-Font::Font(const byte *data) : _dataPtr(data) {
+Font::Font(const byte *data, bool isCRF) : _dataPtr(data), _isCRF(isCRF) {
 	assert(data);
 
 	bool hasWidths = _dataPtr[0] & 0x80;
@@ -44,21 +44,40 @@ Font::Font(const byte *data) : _dataPtr(data) {
 	_data       = _dataPtr + 4;
 	_itemWidth  = _dataPtr[0] & 0x7F;
 	_itemHeight = _dataPtr[1];
-	_startItem  = _dataPtr[2];
-	_endItem    = _dataPtr[3];
-	_charWidths = nullptr;
 
 	uint8 rowAlignedBits = (_itemWidth - 1) / 8 + 1;
 
 	_itemSize = rowAlignedBits * _itemHeight;
-	_bitWidth = _itemWidth;
+
+	if (_isCRF) {
+		uint16 charCount = READ_LE_UINT16(_dataPtr + 2);
+		_startItem = 0;
+		_endItem = charCount - 1;
+		//_itemSize = _itemWidth * _itemHeight + 3;
+		_itemSize += 3;
+		_charDataMap = new Common::HashMap<uint16, const byte *>();
+		for (uint16 i = 0; i < charCount; ++i) {
+			uint16 code = READ_LE_UINT16(_data + i * _itemSize);
+			const byte *charData = _data + i * _itemSize + 3;
+			_charDataMap->setVal(code, charData);
+		}
+	} else {
+		_startItem  = _dataPtr[2];
+		_endItem    = _dataPtr[3];
+
+		_bitWidth = _itemWidth;
+		_charDataMap = nullptr;
+	}
+	_charWidths = nullptr;
 
 	if (hasWidths)
-		_charWidths = _dataPtr + 4 + _itemSize * getCharCount();
+		_charWidths = _data + _itemSize * getCharCount();
 }
 
 Font::~Font() {
 	delete[] _dataPtr;
+	if (_charDataMap)
+		delete _charDataMap;
 }
 
 uint8 Font::getCharWidth(uint8 c) const {
@@ -91,20 +110,8 @@ bool Font::isMonospaced() const {
 	return _charWidths == nullptr;
 }
 
-void Font::drawLetter(Surface &surf, uint8 c, uint16 x, uint16 y,
-		uint32 color1, uint32 color2, bool transp) const {
-
-	uint16 data;
-
-	if (c == '\r' || c == '\n')
-		return;
-
-	const byte *src = getCharData(c);
-	if (!src) {
-		warning("Font::drawLetter(): getCharData() == 0");
-		return;
-	}
-
+void Font::drawLetter(Surface &surf, const byte *charData, uint16 x, uint16 y,
+					  uint32 color1, uint32 color2, bool transp) const {
 	Pixel dst = surf.get(x, y);
 
 	int nWidth = _itemWidth;
@@ -118,7 +125,7 @@ void Font::drawLetter(Surface &surf, uint8 c, uint16 x, uint16 y,
 
 		for (int k = 0; k < nWidth; k++) {
 
-			data = *src++;
+			uint16 data = *charData++;
 			for (int j = 0; j < MIN(8, width); j++) {
 
 				if (dst.isValid()) {
@@ -138,6 +145,36 @@ void Font::drawLetter(Surface &surf, uint8 c, uint16 x, uint16 y,
 
 		dst += surf.getWidth() - _itemWidth;
 	}
+}
+
+void Font::drawLetter(Surface &surf, uint8 c, uint16 x, uint16 y,
+		uint32 color1, uint32 color2, bool transp) const {
+
+	if (c == '\r' || c == '\n')
+		return;
+
+	const byte *src = getCharData(c);
+	if (!src) {
+		warning("Font::drawLetter(): getCharData() == null");
+		return;
+	}
+
+	drawLetter(surf, src, x, y, color1, color2, transp);
+}
+
+void Font::drawLetterWideChar(Surface &surf, uint16 c, uint16 x, uint16 y,
+							  uint32 color1, uint32 color2, bool transp) const {
+
+	if (c == '\r' || c == '\n')
+		return;
+
+	const byte *src = getWideCharData(c);
+	if (!src) {
+		warning("Font::drawLetterWideChar(): getWideCharData() == null");
+		return;
+	}
+
+	drawLetter(surf, src, x, y, color1, color2, transp);
 }
 
 void Font::drawString(const Common::String &str, int16 x, int16 y, int16 color1, int16 color2,
@@ -169,6 +206,17 @@ const byte *Font::getCharData(uint8 c) const {
 	return _data + (c - _startItem) * _itemSize;
 }
 
+const byte *Font::getWideCharData(uint16 c) const {
+	if (!_charDataMap) {
+		warning("Font::getWideCharData(): _charDataMap == null");
+		return nullptr;
+	}
+
+	if (_charDataMap->contains(c))
+		return _charDataMap->getVal(c);
+	else
+		return nullptr;
+}
 
 Video::Video(GobEngine *vm) : _vm(vm) {
 	_doRangeClamp = false;

@@ -160,6 +160,15 @@ void Init::initGame() {
 		delete infFile;
 	}
 
+	if (_vm->_language == Common::JA_JPN) {
+		for (int i = 0; i < Draw::kJapaneseFontCount; i++) {
+			uint16 fontIndex = i + 4;
+			uint16 japFileNumber = i + 1;
+			Common::String fontFile = Common::String::format("JAP%d.CRF", japFileNumber);
+			_vm->_draw->loadFont(fontIndex, fontFile.c_str(), true);
+		}
+	}
+
 	if (_vm->_dataIO->hasFile(_vm->_startTot)) {
 		_vm->_inter->allocateVars(Script::getVariablesCount(_vm->_startTot.c_str(), _vm));
 

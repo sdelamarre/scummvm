@@ -711,17 +711,17 @@ void Draw::wobble(Surface &surfDesc) {
 	delete[] offsets;
 }
 
-Font *Draw::loadFont(const char *path) const {
+Font *Draw::loadFont(const char *path, bool isCRF) const {
 	if (!_vm->_dataIO->hasFile(path))
 		return nullptr;
 
 	int32 size;
 	byte *data = _vm->_dataIO->getFile(path, size);
 
-	return new Font(data);
+	return new Font(data, isCRF);
 }
 
-bool Draw::loadFont(uint16 fontIndex, const char *path) {
+bool Draw::loadFont(uint16 fontIndex, const char *path, bool isCRF) {
 	if (fontIndex >= kFontCount) {
 		warning("Draw::loadFont(): Font %d > Count %d (\"%s\")", fontIndex, kFontCount, path);
 		return false;
@@ -729,7 +729,7 @@ bool Draw::loadFont(uint16 fontIndex, const char *path) {
 
 	delete _fonts[fontIndex];
 
-	_fonts[fontIndex] = loadFont(path);
+	_fonts[fontIndex] = loadFont(path, isCRF);
 
 	return _fonts[fontIndex] != nullptr;
 }

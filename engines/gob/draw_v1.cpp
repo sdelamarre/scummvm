@@ -421,23 +421,77 @@ void Draw_v1::spriteOperation(int16 operation) {
 		break;
 
 	case DRAW_PRINTTEXT:
-		if ((_fontIndex >= kFontCount) || !_fonts[_fontIndex]) {
+		if ((_fontIndex >= kFontCount || !_fonts[_fontIndex]) && _vm->_language != Common::JA_JPN) {
 			warning("Trying to print \"%s\" with undefined font %d", _textToPrint, _fontIndex);
 			break;
 		}
 
-		font = _fonts[_fontIndex];
-		len = strlen(_textToPrint);
-		dirtiedRect(_destSurface, _destSpriteX, _destSpriteY,
-				_destSpriteX + len * font->getCharWidth() - 1,
-				_destSpriteY + font->getCharHeight() - 1);
+		if (_vm->_language == Common::JA_JPN) {
+			int16 totalWidth = 0;
+			uint8 maxHeight = 0;
+			for (int i = 0; _textToPrint[i] != '\0';) {
+				if ((uint8) _textToPrint[i + 1] > 0x80) {
+					// Japanese character (two bytes), font depends on the character
+					uint8 byte2 = _textToPrint[i + 1];
+					uint16 japFontIndex = 1;
 
-		for (int i = 0; i < len; i++) {
-			font->drawLetter(*_spritesArray[_destSurface], _textToPrint[i],
-					_destSpriteX, _destSpriteY, _frontColor, _backColor, _transparency);
+					if (byte2 == 129 || byte2 == 132)
+						japFontIndex = 9;
+					else if (byte2 <= 138)
+						japFontIndex = 1;
+					else if (byte2 <= 143)
+						japFontIndex = 2;
+					else if (byte2 <= 148)
+						japFontIndex = 3;
+					else if (byte2 <= 153)
+						japFontIndex = 4;
+					else if (byte2 <= 158)
+						japFontIndex = 5;
+					else if (byte2 <= 227)
+						japFontIndex = 6;
+					else if (byte2 <= 232)
+						japFontIndex = 7;
+					else if (byte2 <= 252)
+						japFontIndex = 8;
 
-			_destSpriteX += font->getCharWidth();
+					font = _fonts[3 + japFontIndex];
+					uint16 c = READ_LE_UINT16(&_textToPrint[i]);
+
+					font->drawLetterWideChar(*_spritesArray[_destSurface], c,
+											 _destSpriteX, _destSpriteY, _frontColor, _backColor, _transparency);
+
+					i += 2;
+				} else {
+					// Latin character (one byte), use the default font
+					font = _fonts[0];
+					font->drawLetter(*_spritesArray[_destSurface], _textToPrint[i],
+									 _destSpriteX, _destSpriteY, _frontColor, _backColor, _transparency);
+					++i;
+				}
+
+				_destSpriteX += font->getCharWidth();
+				totalWidth += font->getCharWidth();
+				maxHeight = MAX(maxHeight, font->getCharHeight());
+			}
+
+			dirtiedRect(_destSurface, _destSpriteX, _destSpriteY,
+						_destSpriteX + totalWidth - 1,
+						_destSpriteY + maxHeight - 1);
+		} else {
+			font = _fonts[_fontIndex];
+			len = strlen(_textToPrint);
+			dirtiedRect(_destSurface, _destSpriteX, _destSpriteY,
+						_destSpriteX + len * font->getCharWidth() - 1,
+						_destSpriteY + font->getCharHeight() - 1);
+
+			for (int i = 0; i < len; i++) {
+				font->drawLetter(*_spritesArray[_destSurface], _textToPrint[i],
+								 _destSpriteX, _destSpriteY, _frontColor, _backColor, _transparency);
+
+				_destSpriteX += font->getCharWidth();
+			}
 		}
+
 		break;
 
 	case DRAW_DRAWBAR:
@@ -479,7 +533,7 @@ void Draw_v1::spriteOperation(int16 operation) {
 		}
 
 		font = _fonts[_fontIndex];
-		if (_fontToSprite[_fontIndex].sprite == -1) {
+		if (_fontIndex >= 4 || _fontToSprite[_fontIndex].sprite == -1) {
 			dirtiedRect(_destSurface, _destSpriteX, _destSpriteY,
 					_destSpriteX + font->getCharWidth()  - 1,
 					_destSpriteY + font->getCharHeight() - 1);

@@ -45,13 +45,14 @@ namespace Gob {
 
 class Draw {
 public:
-	static const int kSpriteCount    = 100;
-	static const int kFontCount      =  16;
-	static const int kFrontSurface   =  20;
-	static const int kBackSurface    =  21;
-	static const int kAnimSurface    =  22;
-	static const int kCursorSurface  =  23;
-	static const int kCaptureSurface =  30;
+	static const int kSpriteCount       = 100;
+	static const int kFontCount         =  16;
+	static const int kJapaneseFontCount =   9;
+	static const int kFrontSurface      =  20;
+	static const int kBackSurface       =  21;
+	static const int kAnimSurface       =  22;
+	static const int kCursorSurface     =  23;
+	static const int kCaptureSurface    =  30;
 
 	enum AdjustOp {
 		kDouble = 0,
@@ -215,8 +216,8 @@ public:
 	static const int16 _wobbleTable[360];
 	void wobble(Surface &surfDesc);
 
-	Font *loadFont(const char *path) const;
-	bool loadFont(uint16 fontIndex, const char *path);
+	Font *loadFont(const char *path, bool isCRF = false) const;
+	bool loadFont(uint16 fontIndex, const char *path, bool isCRF = false);
 
 	virtual void initScreen() = 0;
 	virtual void closeScreen() = 0;

@@ -471,6 +471,9 @@ Common::String Resources::getLocTextFile(const Common::String &fileBase,
 	case kLanguageHebrew:
 		locTextFile += "isr";
 		break;
+	case kLanguageJapanese:
+		locTextFile += "jap";
+		break;
 	default:
 		locTextFile += "ang";
 		break;
