@@ -2011,7 +2011,7 @@ bool VMDDecoder::loadStream(Common::SeekableReadStream *stream) {
 		}
 	}
 
-	_soundFreq        = _stream->readSint16LE();
+	_soundFreq        = _stream->readUint16LE();
 	_soundSliceSize   = _stream->readSint16LE();
 	_soundSlicesCount = _stream->readSint16LE();
 	_soundFlags       = _stream->readUint16LE();
