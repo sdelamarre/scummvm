@@ -167,7 +167,11 @@ int VideoPlayer::openVideo(bool primary, const Common::String &file, Properties 
 
 		// WORKAROUND: In some rare cases, the cursor should still be
 		// displayed while a video is playing.
-		_noCursorSwitch = false;
+		if (_vm->getGameType() == kGameTypeAdibou2)
+			_noCursorSwitch = true; // For Adibou2, we want to see the cursor, on the contrary
+		else
+			_noCursorSwitch = false;
+
 		if (primary && (_vm->getGameType() == kGameTypeLostInTime)) {
 			if (!file.compareToIgnoreCase("PORTA03") ||
 			    !file.compareToIgnoreCase("PORTA03A") ||
