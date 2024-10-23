@@ -978,7 +978,7 @@ protected:
 class SaveLoad_v7: public SaveLoad {
 public:
 	static const uint32 kChildrenCount = 16;
-	static const uint32 kAdibou2NbrOfApplications = 5;
+	static const uint32 kAdibou2NbrOfApplications = 7;
 	static const uint32 kAdibou2NbrOfSavedDrawings = 12;
 	static const uint32 kAdibou2NbrOfConstructionGameFiles = 3;
 	SaveLoad_v7(GobEngine *vm, const char *targetName);
